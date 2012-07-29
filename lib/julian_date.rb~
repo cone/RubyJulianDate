@@ -1,0 +1,64 @@
+class Julian_date
+	@JGREG = 15 + 31*(10+12*1582)
+	@HALFSECOND = 0.5
+
+	def self.current
+		puts "A number"
+	end
+	
+	def self.toJulian(date)
+		day = date[:day]
+		month = date[:month]
+		year = date[:year]
+		julianYear = year
+		if (year < 0) 
+			julianYear+=1
+		end
+	    julianMonth = month
+	    if (month > 2) 
+		  julianMonth+=1
+	    else 
+		  julianYear-=1
+		  julianMonth += 13
+	    end
+		
+		julian = ((365.25 * julianYear).floor+ (30.6001*julianMonth).floor + day + 1720995.0)
+		
+		if (day + 31 * (month + 12 * year) >= @JGREG) 
+			ja = (0.01 * julianYear).to_i
+			julian += 2 - ja + (0.25 * ja)
+        	end
+		
+		return julian.floor
+	end
+	
+	def self.toGreg(injulian)
+
+		julian = injulian + @HALFSECOND / 86400.0
+		   ja = julian.to_i
+		   if (ja>= @JGREG) 
+		     jalpha = (((ja - 1867216) - 0.25) / 36524.25).to_i
+		     ja = ja + 1 + jalpha - jalpha / 4
+		   end
+
+		   jb = ja + 1524
+		   jc = (6680.0 + ((jb - 2439870) - 122.1) / 365.25).to_i
+		   jd = 365 * jc + jc / 4
+		   je = ((jb - jd) / 30.6001).to_i
+		   day = jb - jd - (30.6001 * je).to_i
+		   month = je - 1
+
+		   if (month > 12) then month = month - 12 end
+		   year = jc - 4715
+		   if (month > 2) then year-=1 end
+		   if (year <= 0) then year-=1 end
+
+		   day = day.to_s
+		   month = month.to_s
+
+		   if day.length < 2 then day = "0"+day end
+		   if month.length < 2 then month = "0"+month end
+
+		   return {:day => day, :month => month, :year => year.to_s};
+	end
+end
